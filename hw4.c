@@ -19,7 +19,7 @@ typedef struct _Node{
 } Q_NODE;
 
 ITEM items[10001];
-Q_NODE heap[10001]; // priority queue
+Q_NODE heap[100001]; // priority queue
 int heap_size;
 
 int compare(const void * a, const void * b)
@@ -54,8 +54,8 @@ int main()
 
 	printf("\tprocessing time / maximum benefit value\n");
 	fprintf(fp, "\tprocessing time / maximum benefit value\n");
-	printf("%-6s|%-22s|%-21s|%-20s|\n", "Items", "Greedy", "D. P.", "B. & B.");
-	fprintf(fp, "%-6s|%-22s|%-21s|%-20s|\n", "Items", "Greedy", "D. P.", "B. & B.");
+	printf("%-6s|%-21s|%-21s|%-20s|\n", "Items", "Greedy", "D. P.", "B. & B.");
+	fprintf(fp, "%-6s|%-21s|%-21s|%-20s|\n", "Items", "Greedy", "D. P.", "B. & B.");
 	for(i = 1; i < 10; i++){
 		random_gen(num[i]);
 		qsort(items, num[i]+1, sizeof(ITEM), compare);
@@ -70,15 +70,15 @@ int main()
 		end = clock();
 		
 		fprintf(fp, "%-6d|", num[i]);
-		fprintf(fp, "%6.3fms/%13.3f|", (float)(m2-m1)/CLOCKS_PER_MS, gdy);
+		fprintf(fp, "%6.3fms/%12.3f|", (float)(m2-m1)/CLOCKS_PER_MS, gdy);
 		fprintf(fp, "%10.3fms/%8d|", (float)(m3-m2)/CLOCKS_PER_MS, dp);
-		fprintf(fp, "%.3fms/%d|", (float)(end-m3)/CLOCKS_PER_MS, bnb);
+		fprintf(fp, "%9.3fms/%8d|", (float)(end-m3)/CLOCKS_PER_MS, bnb);
 		fprintf(fp, "\n");
 
 		printf("%-6d|", num[i]);
-		printf("%6.3fms/%13.3f|", (float)(m2-m1)/CLOCKS_PER_MS, gdy);
+		printf("%6.3fms/%12.3f|", (float)(m2-m1)/CLOCKS_PER_MS, gdy);
 		printf("%10.3fms/%8d|", (float)(m3-m2)/CLOCKS_PER_MS, dp);
-		printf("%.3fms/%d|", (float)(end-m3)/CLOCKS_PER_MS, bnb);
+		printf("%9.3fms/%8d|", (float)(end-m3)/CLOCKS_PER_MS, bnb);
 		printf("\n");	
 	}
 	fclose(fp);
@@ -158,18 +158,20 @@ int branch_bnd(int max_W, int num)
 		childs[0].bnf = parent.bnf + items[childs[0].level].bnf;
 		childs[0].weight = parent.weight + items[childs[0].level].weight;
 		childs[0].bnd = childs[0].bnf + cal_bound(max_W - childs[0].weight,childs[0].level, num);
-		max_benefit = MAX(max_benefit, childs[0].bnf);
 
 		childs[1].level = parent.level + 1;
 		childs[1].bnf = parent.bnf;
 		childs[1].weight = parent.weight;
 		childs[1].bnd = childs[1].bnf + cal_bound(max_W - childs[1].weight,childs[1].level + 1, num);
-		max_benefit = MAX(max_benefit, childs[1].bnf);
 
-		if((childs[0].bnd > max_benefit) && (childs[0].weight <= max_W))
+		if((childs[0].bnd > max_benefit) && (childs[0].weight <= max_W)){
 			heap_push(childs[0]);
-		if((childs[1].bnd > max_benefit) && (childs[1].weight <= max_W))
+			max_benefit = MAX(max_benefit, childs[0].bnf);
+		}
+		if((childs[1].bnd > max_benefit) && (childs[1].weight <= max_W)){
 			heap_push(childs[1]);
+			max_benefit = MAX(max_benefit, childs[1].bnf);
+		}
 	}
 
 	return max_benefit;
@@ -197,6 +199,10 @@ float cal_bound(int max_W, int start, int num)
 void heap_push(Q_NODE node)
 {
 	heap_size++;
+	if(heap_size > 100000){
+		printf("heap overflow\n");
+		return;
+	}
 	heap[heap_size] = node;
 	max_heapIN(heap_size);
 }
