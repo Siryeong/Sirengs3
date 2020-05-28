@@ -4,6 +4,7 @@
 
 typedef struct _node{
     struct _node * next;
+    int idx;
     char city;
 }NODE;
 
@@ -12,7 +13,7 @@ NODE trans[21];
 int graph[21][21] = {0,};
 int matsize = 0;
 
-void insert_list(NODE * head, char city)
+void insert_list(NODE * head, char city, int idx)
 {
     NODE * search = head;
     while(search->next != NULL)
@@ -20,6 +21,7 @@ void insert_list(NODE * head, char city)
     
     NODE * node = malloc(sizeof(NODE));
     node->city = city;
+    node->idx = idx;
     node->next = NULL;
     search->next = node;
 }
@@ -46,12 +48,13 @@ void graph2list()
     for(i = 0; i <= matsize; i++){
         list[i].city = (char)graph[i][0];
         list[i].next = NULL;
+        list[i].idx = i;
     }
     
     for(i = 1; i <= matsize; i++){
         for(j = 1; j <= matsize; j++){
             if(graph[i][j] == 1){
-                insert_list(&list[i], (char)graph[0][j]);
+                insert_list(&list[i], (char)graph[0][j], j);
             }
         }
     }
@@ -66,14 +69,15 @@ void transpose()
     for(i = 0; i <= matsize; i++){
         trans[i].city = (char)graph[0][i];
         trans[i].next = NULL;
+        trans[i].idx = i;
     }
     
     for(i = 1; i <= matsize; i++){
         search = &list[i];
         search = search->next;
         while(search != NULL){
-            idx = (int)search->city - 'A' + 1;
-            insert_list(&trans[idx], (char)(i + 'A' - 1));
+            idx = search->idx;
+            insert_list(&trans[idx], (char)graph[0][i], i);
             search = search->next;
         }
     }
