@@ -139,8 +139,10 @@ int main()
 {
     matrix_init();
     //printmatrix();
+	printf("<adjacency>\n");
     graph2list();
     printf("=======================\n");
+	printf("<transpose>\n");
     transpose();
 
     
