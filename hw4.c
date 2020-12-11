@@ -142,7 +142,6 @@ int branch_bnd(int max_W, int num)
 	int i, max_benefit = 0;
 	Q_NODE parent, childs[2];
 
-	//initial and root
 	heap_size = 0;
 	heap[0].bnf = 0;
 	heap[0].weight = 0;
@@ -152,12 +151,12 @@ int branch_bnd(int max_W, int num)
 
 	while(heap_size > 0){
 		parent = heap_pop();
-		//left child
+		//left
 		childs[0].level = parent.level + 1;
 		childs[0].bnf = parent.bnf + items[childs[0].level].bnf;
 		childs[0].weight = parent.weight + items[childs[0].level].weight;
 		childs[0].bnd = childs[0].bnf + cal_bound(max_W - childs[0].weight,childs[0].level, num);
-		//right child
+		//right
 		childs[1].level = parent.level + 1;
 		childs[1].bnf = parent.bnf;
 		childs[1].weight = parent.weight;
